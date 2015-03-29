@@ -1,6 +1,6 @@
 getlex
 ------
-Recupera todas as URNs LEX do http://www.lexml.gov.br/ e permite análise estatística em base SQL local.
+Recupera todas as URNs LEX do [www.lexml.gov.br](http://www.lexml.gov.br/) e permite análise estatística em base SQL local.
 
 # Apresentação #
 O retorno das buscas realizadas pelo  [Portal LexML](http://www.lexml.gov.br/) nos fornece uma "ficha catalográfica" da norma desejada. Por exemplo, o *Código das Águas* é apresentado em 
@@ -38,17 +38,15 @@ CREATE TABLE lexml.grupo(  -- agrupamentos de URNs
   regras xml -- descrição das regras de segmentação e critérios de curadoria.
 );
 CREATE TABLE lexml.urn_split( -- URNs explodidas
-   local VARCHAR(100) NOT NULL,   -- exs. "br", "br;sao.paulo;campinas".
+   local VARCHAR(100) NOT NULL,   -- parte inicial da URN
    aut VARCHAR(100) NOT NULL,     -- autoridade 
    tipo VARCHAR(100) NOT NULL,    -- exs. lei, decreto, etc.
-   ano SMALLINT NOT NULL,         -- ano da data de publicação.
-   mes_dia CHAR(5) NOT NULL,      -- MM-DD da data de publicação.
+   ano SMALLINT NOT NULL,         -- ano da data de publicação
+   mes_dia CHAR(5) NOT NULL,      -- MM-DD da data de publicação
    codigo VARCHAR(100) NOT NULL,  -- parte final da URN
    grupo_id INTEGER REFERENCES lexml.grupo(id),  -- id do grupo
-   idg1 INTEGER,  -- GERADO, persistente (prj shortlex)
-   idg2 INTEGER,  -- GERADO, persistente (prj shortlex)
+   ...
    UNIQUE(LOCAL, aut, tipo, ano, mes_dia, codigo), -- validação
-   UNIQUE(id1,id2)  -- validação e primary key.
 );
 CREATE VIEW lexml.urn_join AS 
   SELECT *, LOCAL||':'||aut||':'||tipo||':'||ano||'-'||mes_dia||':'||codigo AS urn 

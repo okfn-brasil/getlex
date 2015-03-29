@@ -1,0 +1,78 @@
+{
+  "name": "getlex",
+  "title": "Recupera todas as URNs LEX do http://www.lexml.gov.br/ e permite análise estatística em base SQL local",
+  "format": "csv",
+  "datapackage_version": "1.0-beta.1",
+  "licenses": [
+    {
+      "id": "odc-pddl",
+      "name": "Public Domain Dedication and License",
+      "version": "1.0",
+      "url": "http://opendatacommons.org/licenses/pddl/1.0/"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Coordenadoria do LexML",
+      "web": "http://projeto.lexml.gov.br/contact-info"
+    },
+  ],
+  "resources": [
+    {
+      "url": "https://github.com/ppKrauss/master/getlex/data/grupo1.csv",
+      "path": "data/grupo1.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "id",
+            "description": "ID da norma no grupo1",
+            "type": "integer"
+          },
+          {
+            "name": "Apelido",
+            "description": "Apelido (preferencial) ou título da norma",
+            "type": "string"
+          },
+          {
+            "name": "URN",
+            "description": "URN LEX expressa a partir do local",
+            "type": "string"
+          },
+        ]
+      }
+    },
+
+    {
+      "url": "https://github.com/ppKrauss/getlex/master/data/autoridades.csv",
+      "path": "data/autoridades.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "local",
+            "description": "parte1 da URN, local",
+            "type": "string"
+          },
+          {
+            "name": "autoridade",
+            "description": "parte2 da URN, autoridade",
+            "type": "string"
+          },
+          {
+            "name": "num_tipos",
+            "description": "Número de tipos",
+            "type": "integer"
+          },
+          {
+            "name": "num_urns",
+            "description": "Número de URNs",
+            "type": "integer"
+          }
+        ]
+      }
+    }
+  ],
+  "maintainers":[{
+    "name": "PPKRAUSS",
+    "web": "https://github.com/ppKrauss/getlex"
+  }]
+}
