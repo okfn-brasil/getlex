@@ -49,7 +49,7 @@ CREATE TABLE lexml.urn_split( -- URNs explodidas
    UNIQUE(LOCAL, aut, tipo, ano, mes_dia, codigo), -- validação
 );
 CREATE VIEW lexml.urn_join AS 
-  SELECT *, LOCAL||':'||aut||':'||tipo||':'||ano||'-'||mes_dia||':'||codigo AS urn 
+  SELECT *, local||':'||aut||':'||tipo||':'||ano||'-'||mes_dia||':'||codigo AS urn 
   FROM lexml.urn_split;
 ```
 
@@ -58,17 +58,17 @@ CREATE VIEW lexml.urn_join AS
 Contagem das URNs por *local/autoridade/tipo*:
 ```sql
 WITH tall AS (
-  SELECT LOCAL, aut, tipo, COUNT(*) AS n 
+  SELECT local, aut, tipo, COUNT(*) AS n 
   FROM lexml.urn_split 
   GROUP BY LOCAL,aut,tipo
-) SELECT LOCAL, aut, COUNT(*) AS n_tipos, SUM(n) AS n_urns 
+) SELECT local, aut, COUNT(*) AS n_tipos, SUM(n) AS n_urns 
   FROM tall 
-  GROUP BY LOCAL,aut;
+  GROUP BY local,aut;
 ```
 
 Contagem das URNs por tamanho em grupos *local/autoridade/tipo*:
 ```sql
-  SELECT LENGTH(LOCAL||aut||tipo) AS len, COUNT(*) AS n
+  SELECT LENGTH(local||aut||tipo) AS len, COUNT(*) AS n
   FROM lexml.urn_split
   GROUP BY 1
   ORDER BY 2 DESC;
@@ -76,7 +76,7 @@ Contagem das URNs por tamanho em grupos *local/autoridade/tipo*:
 
 Contagem das URNs por tamanho em grupos *local/autoridade*:
 ```sql
-  SELECT LENGTH(LOCAL||aut) AS len, COUNT(*) AS n
+  SELECT LENGTH(local||aut) AS len, COUNT(*) AS n
   FROM lexml.urn_split
   GROUP BY 1
   ORDER BY 2 DESC;
