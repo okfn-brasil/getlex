@@ -13,10 +13,13 @@ O Portal LexML é apenas um dos recursos disponibilizados pelo [Projeto LexML](h
 
 A URN LEX é central a todas as iniciativas de transparência e interoperabilidade. A listagem de todas as URNs (mais de 3 milhões) pode ser útil para quem deseja realizar estatísiticas ou implementar localmente algum recurso LexML.
 
-## Disponibilidade dos dados
-Como são muitos dados, a totalidade das URN LEX não podem ser disponibilizadas como simples download, pois comprometeria a banda do servidor Lexml.gov.br. O download completo das URNs é oferecido em blocos de 50mil items, e a lista completa dos blocos **[deve ser solicitada pelo formulário de contato do LexML](http://projeto.lexml.gov.br/contact-info)**, sendo em  seguida enviada por e-mail, onde estará disível o arquivo completo `sitemap_index.xml`.
+## Dados oferecidos pelo projeto
+Os milhões de URNs LEX podem ser conseguidos seguindo a instalação e procedimentos indicados. Os relatórios e sumarização dos dados, por outro lado, são disponibilizados diretamente como dados abertos:
 
-Recomenda-se baixar os dados (rodar `carga.php`) apenas em horário de menor demanda (madrugada de Brasília).
+ * [autoridades.csv](https://github.com/ppKrauss/getlex/blob/master/data/autoridades.csv): listagem corrente das autoridades que postaram seus documentos no LexML.
+ * [jurisdicoes.csv](https://github.com/ppKrauss/getlex/blob/master/data/jurisdicoes.csv): listagem corrente das jurisdições (áreas) com autoridades que postaram seus documentos no LexML.
+ * ...
+ * [urn_prefixos.csv](https://github.com/ppKrauss/getlex/blob/master/data/urn_prefixos.csv): dados de carga, contém os IDs padronizados dos prefixos das URNs. 
 
 # Objetivos#
 O presente projeto tem por finalidade:
@@ -53,32 +56,42 @@ CREATE VIEW lexml.urn_join AS
   FROM lexml.urn_split;
 ```
 
-## Exemplos de consulta SQL
-
-Contagem das URNs por *local/autoridade/tipo*:
-```sql
-WITH tall AS (
-  SELECT local, aut, tipo, COUNT(*) AS n 
-  FROM lexml.urn_split 
-  GROUP BY LOCAL,aut,tipo
-) SELECT local, aut, COUNT(*) AS n_tipos, SUM(n) AS n_urns 
-  FROM tall 
-  GROUP BY local,aut;
+## Instalação
+Depois do `git clone` temos uma pasta `/getlex`, a partir da qual podemos rodar o script de carga:
+```shel
+  psql -h localhost -p 5432 -U postgres < ini.sql
+  psql -h localhost -p 5432 -U postgres -c "
+    COPY lexml.urn_prefixos FROM '/yourLocalPath/getlex/data/urn_prefixos.csv' DELIMITER ',' CSV HEADER
+  "
+  php carga.php xml
+  php carga.php
 ```
+O primeiro comando iniciado por `psql` cria as tabelas SQL do esquema lexml, apresentado na seção anterior. Em seguida (segundo  `psql`) deve-se efetuar a carga do 
 
-Contagem das URNs por tamanho em grupos *local/autoridade/tipo*:
-```sql
-  SELECT LENGTH(local||aut||tipo) AS len, COUNT(*) AS n
-  FROM lexml.urn_split
-  GROUP BY 1
-  ORDER BY 2 DESC;
-```
 
-Contagem das URNs por tamanho em grupos *local/autoridade*:
-```sql
-  SELECT LENGTH(local||aut) AS len, COUNT(*) AS n
-  FROM lexml.urn_split
-  GROUP BY 1
-  ORDER BY 2 DESC;
+O primeiro comando `php carga` traz os arquivos XML em meia hora ou um pouco mais se a rede estiver lenta; o segundo faz de fato a carga no banco de dados. Fazer a carga em duas etapas gasta temporariamente mais disco, mas em geral é mais seguro que opção `php carga.php direto`, tendo em vista que a demora maior é de CPU para processar os comandos `INSERT` no SQL, tratado em blocos para evitar inconsistências em caso de falha.
+
+Se a base já existe, e a intenção é atualizar, deve-se conferir se a aplicação (ex. *shortlex*) criou seu próprio script de manutenção, e portanto deve-se tomar muito coidado antes de realizar no SQL o comando `DROP SCHEMA lexml CASCADE`, `DELETE` ou similares.
+
+### Disponibilidade e carga na base de dados
+Como são muitos dados, a totalidade das URN LEX não pode ser disponibilizada como simples *download*, pois comprometeria a banda do servidor `Lexml.gov.br`. O *download* completo das URNs é oferecido em blocos de 50 mil items, e a lista completa dos blocos **[deve ser solicitada pelo formulário de contato do LexML](http://projeto.lexml.gov.br/contact-info)**, sendo em  seguida enviada por e-mail, onde estará disível o arquivo completo `sitemap_index.xml`.
+
+Recomenda-se baixar os dados (rodar `carga.php`) apenas em horário de menor demanda (madrugada de Brasília).
+
+## Preparação dos arquivos CSV
+A geração de [arquivos CSV-dataset padrão](https://github.com/datasets), no contexto *getlex*, é realizada a partir de uma base SQL, local ou do servidor. A tabela que origina o `urn_prefixos.csv`, em particular, vem do servidor central LexML, seus IDs não mudam, as atualizações apenas acrescentam novos IDs. O padrão "OKFN core datasets" adotado também exige que todos os arquivos CSV que constam na pasta de dados `/data` sejam descritos em `datapackage.json`.
+
+Os arquivos de contagem e relatórios oferecidos neste repositório (*getlex*) precisam ser atualizados cada vez que a base LexML é atualizada. Eles foram gerados com os comandos SQL do script `preparo.php`.
+
+Exemplo: o arquivo `foo.csv` poderia ser gerado pelo seguinte comando de shell,
+```shell
+psql -h localhost -p 5432 -U postgres -c "
+ COPY (SELECT a,b FROM foo) TO STDOUT WITH DELIMITER ',' CSV HEADER
+"> data/foo.csv
 ```
+e esse preparo difere dos demais apenas pelo trecho `SELECT a,b FROM foo`. Desse modo o script  `preparo.php` é apenas um script que armazena as especificações SQL de cada preparo, e executa diversas vezes o template de comando shell, uma para cada preparo.
+<!--
+ou ainda com `\copy (...) TO '/tmp/test.csv' WITH ...` (o PHP também oferece [pg_copy_to](http://php.net/manual/en/function.pg-copy-to.php)), mas a chamada `psql` no termial (*client*) das versões novas (v9+) vem munidas do STDIN/STDOUT.
+-->
+
 

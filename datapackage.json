@@ -1,8 +1,8 @@
 {
   "name": "getlex",
-  "title": "Recupera todas as URNs LEX do http://www.lexml.gov.br/ e permite análise estatística em base SQL local",
+  "title": "Recupera todas as URNs LEX do http://www.lexml.gov.br e permite análise estatística em base SQL local",
   "format": "csv",
-  "datapackage_version": "1.0-beta.1",
+  "datapackage_version": "1.0-beta.2",
   "licenses": [
     {
       "id": "odc-pddl",
@@ -11,66 +11,99 @@
       "url": "http://opendatacommons.org/licenses/pddl/1.0/"
     }
   ],
+
   "sources": [
     {
-      "name": "Coordenadoria do LexML",
+      "name": "Coordenação do LexML",
       "web": "http://projeto.lexml.gov.br/contact-info"
     },
   ],
-  "resources": [
-    {
-      "url": "https://github.com/ppKrauss/master/getlex/data/grupo1.csv",
-      "path": "data/grupo1.csv",
-      "schema": {
-        "fields": [
-          {
-            "name": "id",
-            "description": "ID da norma no grupo1",
-            "type": "integer"
-          },
-          {
-            "name": "Apelido",
-            "description": "Apelido (preferencial) ou título da norma",
-            "type": "string"
-          },
-          {
-            "name": "URN",
-            "description": "URN LEX expressa a partir do local",
-            "type": "string"
-          },
-        ]
-      }
-    },
 
-    {
+  "resources": [
+     {
+      "url": "https://github.com/ppKrauss/getlex/master/data/urn_prefixos.csv",
+      "path": "data/urn_prefixos.csv",
+      "date": "2015-03-25",
+      "schema": {"fields": [
+		  {
+		    "name": "id",
+		    "description": "Identificador único do prefixo",
+		    "type": "integer"
+		  },
+		  {
+		    "name": "prefixo",
+		    "description": "Prefixo de URN LEX-BR",
+		    "type": "string"
+		  },
+		  {
+		    "name": "escopo",
+		    "description": "Escopo das URNs (leg=legislação/jus=jurisprudência/prj=proposições/bib=doutrina)",
+		    "type": "string"
+		  },
+		  {
+		    "name": "kx_n_urns",
+		    "description": "Cache do número de normas (carga com oficial depois com refresh pode ser o local)",
+		    "type": "string"
+		  }
+	]}
+     },
+
+     {
+      "url": "https://github.com/ppKrauss/getlex/master/data/jurisdicoes.csv",
+      "path": "data/jurisdicoes.csv",
+      "sql": "SELECT (string_to_array(prefixo,':',''))[1] as jurisdicao, sum(kx_n_urns) as n_urns FROM lexml.urn_prefixos group by 1 order by 1",
+      "schema": {"fields": [
+		  {
+		    "name": "jurisdicao",
+		    "description": "Nome de jurisdição conforme ortgrafia das URNs LEX",
+		    "type": "string"
+		  },
+		  {
+		    "name": "n_urns",
+		    "description": "Número de URNs que aparecem com essa jurisdição",
+		    "type": "integer"
+		  }
+	]}
+     },
+
+     {
       "url": "https://github.com/ppKrauss/getlex/master/data/autoridades.csv",
       "path": "data/autoridades.csv",
-      "schema": {
-        "fields": [
-          {
-            "name": "local",
-            "description": "parte1 da URN, local",
-            "type": "string"
-          },
-          {
-            "name": "autoridade",
-            "description": "parte2 da URN, autoridade",
-            "type": "string"
-          },
-          {
-            "name": "num_tipos",
-            "description": "Número de tipos",
-            "type": "integer"
-          },
-          {
-            "name": "num_urns",
-            "description": "Número de URNs",
-            "type": "integer"
-          }
-        ]
-      }
-    }
-  ],
+      "sql": "SELECT (string_to_array(prefixo,':',''))[2] as autoridade, sum(kx_n_urns) as n_urns FROM lexml.urn_prefixos group by 1 order by 1",
+      "schema": {"fields": [
+		  {
+		    "name": "autoridade",
+		    "description": "nome de autoridade conforme ortgrafia das URNs LEX",
+		    "type": "string"
+		  },
+		  {
+		    "name": "n_urns",
+		    "description": "Número de URNs que aparecem com essa autoridade",
+		    "type": "integer"
+		  }
+	]}
+     },
+
+     {
+      "url": "https://github.com/ppKrauss/getlex/master/data/tipoDocumento.csv",
+      "path": "data/tipoDocumento.csv",
+      "sql": "SELECT (string_to_array(prefixo,':',''))[3] as tipoDocumento, sum(kx_n_urns) as n_urns FROM lexml.urn_prefixos group by 1 order by 1",
+      "schema": {"fields": [
+		  {
+		    "name": "tipoDocumento",
+		    "description": "Nome de tipo de documento conforme ortgrafia das URNs LEX",
+		    "type": "string"
+		  },
+		  {
+		    "name": "n_urns",
+		    "description": "Número de URNs que aparecem com esse tipo",
+		    "type": "integer"
+		  }
+	]}
+     }
+
+   ],
+
   "maintainers":[{
     "name": "PPKRAUSS",
     "web": "https://github.com/ppKrauss/getlex"

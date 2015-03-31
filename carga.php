@@ -1,15 +1,16 @@
 <?php
 /**
- * Faz carga de dados do LexML. $xmlFile indica locs e parse2sql.php faz SQL de carga.
+ * Faz carga de dados do LexML. $xmlFile indica fontes e parse2sql.php faz SQL de  fonte carregada.
  * Opera em dois modos, direto ou por carga XML temporária.
  *
- * @notes a coordenação do LexML fornece por email um arquivo sitemap_index.xml para listar os blocos.
- * @see php carga.php direto
- * @see php carga.php xml
+ * @note   a coordenação do LexML fornece por email um arquivo sitemap_index.xml para listar os blocos.
+ * @see    php carga.php direto
+ * @see    php carga.php xml
  * @author https://github.com/ppKrauss/getlex
+ * @dependences parse2sql.php
  *
  * INFO: 
- *   taxa de transferência com banda boa, ~8 segundos/bloco.
+ *   taxa de transferência com banda boa, ~8 segundos/bloco. O que mata são os 6 a 8 minutos/bloco de INSERT.
  */
 
 // // BEGIN:CONFIGS // // //
@@ -38,7 +39,11 @@ foreach ($locs as $loc) {
 	if (file_exists($fileCtrl) || ($baiXML && file_exists($fileCtrl))) 
 		print "JA FOI $file";
 	elseif ($baiXML && file_exists($fileXML)) {
-		print "JA FOI $file mas precisa carregar o XML na base... ";
+		print "usando $fileXML... ";
+		$DO = "php parse2sql.php $fileXML | psql -h localhost -p 5432 -U postgres";
+		system($DO);
+		file_put_contents($fileCtrl,'');
+		$nmais++;
 	} else {
 		if ($baiXML) 
 			$DO = "wget -qO- $url > $fileXML";
@@ -47,12 +52,12 @@ foreach ($locs as $loc) {
 		print " OK $nmais/$gerarMais fazendo $file\n\t$DO";
 		system($DO);
 		if (!$baiXML) 
-			file_put_contents($file,'');
-		if ($nmais>=$gerarMais){
-			print ("\n OK FINALIZADA A META DE $gerarMais\n");
-			break;
-		}
+			file_put_contents($fileCtrl,'');
 		$nmais++;
+	}
+	if ($nmais>=$gerarMais){
+		print ("\n OK FINALIZADA A META DE $gerarMais\n");
+		break;
 	}
 	$n++;
 }
