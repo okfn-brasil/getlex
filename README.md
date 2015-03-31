@@ -32,28 +32,33 @@ O presente projeto tem por finalidade:
 Ver `ini.sql`, testado em [PostgreSQL v9+](http://www.postgresql.org/). Resumo:
 
 ```sql
-CREATE TABLE lexml.grupo(  -- agrupamentos de URNs
-  id serial NOT NULL PRIMARY KEY, -- 
-  use_local BOOLEAN NOT NULL,
-  ...
-  is_proposicao not null, -- é proposição
-  is_legislacao not null, -- não é jurisprudencia nem proposição
-  regras xml -- descrição das regras de segmentação e critérios de curadoria.
-);
-CREATE TABLE lexml.urn_split( -- URNs explodidas
-   local VARCHAR(100) NOT NULL,   -- parte inicial da URN
-   aut VARCHAR(100) NOT NULL,     -- autoridade 
-   tipo VARCHAR(100) NOT NULL,    -- exs. lei, decreto, etc.
-   ano SMALLINT NOT NULL,         -- ano da data de publicação
-   mes_dia CHAR(5) NOT NULL,      -- MM-DD da data de publicação
-   codigo VARCHAR(100) NOT NULL,  -- parte final da URN
-   grupo_id INTEGER REFERENCES lexml.grupo(id),  -- id do grupo
+CREATE TABLE lexml.urn_prefixos(
+   --
+   -- Prefixos das URNs LEX-BR, formando um conjunto de categorias.
+   --
+   id serial NOT NULL PRIMARY KEY,
+   prefixo text NOT NULL, -- "jurisdição:autoridade:tipoMedida"
+   escopo char(3),        -- prj=proposições, jus=justiça, leg=legislativo/executivo, bib=bibliotecas
    ...
-   UNIQUE(LOCAL, aut, tipo, ano, mes_dia, codigo), -- validação
 );
-CREATE VIEW lexml.urn_join AS 
-  SELECT *, local||':'||aut||':'||tipo||':'||ano||'-'||mes_dia||':'||codigo AS urn 
-  FROM lexml.urn_split;
+
+CREATE TABLE lexml.urn_detalhes(
+   --
+   -- URNs explodidas em prefixo+detalhe (e data+numeracao)
+   --
+   prefixo_id integer REFERENCES lexml.urn_prefixos(id),
+   datapub date NOT NULL,         -- data (YYYY-MM-DD) de assinatura ou de publicação
+   numeracao VARCHAR(100) NOT NULL, -- final da URN, em geral o número ou código da norma
+   ...
+   UNIQUE(prefixo_id,datapub,numeracao)  -- validação e indexação
+);
+
+CREATE VIEW lexml.urns AS
+   --
+   -- URNs expressas como string unica, e demais dados herdados das demais tabelas.
+   --
+  SELECT p.grupo_id, d.grcnt_id, p.prefixo||':'||d.datapub||':'||d.numeracao as urn, ... 
+  FROM lexml.urn_prefixos p  INNER JOIN lexml.urn_detalhes d ON p.id=d.prefixo_id;
 ```
 
 ## Instalação
