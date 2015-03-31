@@ -11,15 +11,20 @@ onde, junstamente o trecho que se vê na própria URL, `urn:lex:br:federal:decre
 
 O Portal LexML é apenas um dos recursos disponibilizados pelo [Projeto LexML](http://projeto.lexml.gov.br/): os padrões LexML garantem a interoperabilidade de dados legislativos e jurídicos entre todos os tipos de sistemas informatizados, inclusive aqueles voltados para as iniciativas de  [Dados Abertos](http://dados.gov.br/dados-abertos/).
 
-A URN LEX é central a todas as iniciativas de transparência e interoperabilidade. A listagem de todas as URNs (mais de 3 milhões) pode ser útil para quem deseja realizar estatísiticas ou implementar localmente algum recurso LexML.
+A URN LEX (ver [RFC draft](https://datatracker.ietf.org/doc/draft-spinosa-urn-lex/)) é central a todas as iniciativas de transparência e interoperabilidade. A listagem de todas as URNs (mais de 3 milhões) pode ser útil para quem deseja realizar estatísiticas ou implementar localmente algum recurso LexML.
 
 ## Dados oferecidos pelo projeto
-Os milhões de URNs LEX podem ser conseguidos seguindo a instalação e procedimentos indicados. Os relatórios e sumarização dos dados, por outro lado, são disponibilizados diretamente como dados abertos:
+Os milhões de URNs LEX podem ser conseguidos seguindo a instalação e procedimentos indicados. Os relatórios e sumarização dos dados, por outro lado, são disponibilizados diretamente na pasta `/data` como dados abertos,
 
- * [autoridades.csv](https://github.com/ppKrauss/getlex/blob/master/data/autoridades.csv): listagem corrente das autoridades que postaram seus documentos no LexML.
- * [jurisdicoes.csv](https://github.com/ppKrauss/getlex/blob/master/data/jurisdicoes.csv): listagem corrente das jurisdições (áreas) com autoridades que postaram seus documentos no LexML.
- * ...
- * [urn_prefixos.csv](https://github.com/ppKrauss/getlex/blob/master/data/urn_prefixos.csv): dados de carga, contém os IDs padronizados dos prefixos das URNs. 
+**Dados-fonte**:
+
+ * [urn_prefixos.csv](https://github.com/ppKrauss/getlex/blob/master/data/urn_prefixos.csv): dados de carga, contém os IDs padronizados dos prefixos das URNs.
+ * [grupo1.csv](https://github.com/ppKrauss/getlex/blob/master/data/grupo1.csv): listagem das normas "top 35" do Brasil (PARTICIPE! [Edite a planilha e avise aqui no new issues](https://docs.google.com/spreadsheets/d/1_8pmaPkmnPc-EnKFCPbT_YkiaON1nXZFO2i3ITrqog8/edit?usp=sharing)).
+
+**Relatórios** (obtidos do estado atual da base):
+ * [autoridades.csv](https://github.com/ppKrauss/getlex/blob/master/data/autoridades.csv): listagem corrente das *autoridades* que contribuem para o acervo LexML; em particular normas estatutárias (dos poderes Legislativo e Executivo) são responsabilidade das assim-chamadas "autoridades emitentes de normas".
+ * [jurisdicoes.csv](https://github.com/ppKrauss/getlex/blob/master/data/jurisdicoes.csv): listagem corrente das jurisdições (áreas) com *autoridades* que estão presentes no acervo LexML.
+ * [tipoDocumento.csv](https://github.com/ppKrauss/getlex/blob/master/data/tipoDocumento.csv): listagem corrente dos *tipos de documento* (acordões, leis, decretos, livros, artigos, etc.) presentes no acervo LexML.
 
 # Objetivos#
 O presente projeto tem por finalidade:
@@ -33,31 +38,23 @@ Ver `ini.sql`, testado em [PostgreSQL v9+](http://www.postgresql.org/). Resumo:
 
 ```sql
 CREATE TABLE lexml.urn_prefixos(
-   --
    -- Prefixos das URNs LEX-BR, formando um conjunto de categorias.
-   --
    id serial NOT NULL PRIMARY KEY,
    prefixo text NOT NULL, -- "jurisdição:autoridade:tipoMedida"
    escopo char(3),        -- prj=proposições, jus=justiça, leg=legislativo/executivo, bib=bibliotecas
    ...
 );
-
 CREATE TABLE lexml.urn_detalhes(
-   --
    -- URNs explodidas em prefixo+detalhe (e data+numeracao)
-   --
    prefixo_id integer REFERENCES lexml.urn_prefixos(id),
    datapub date NOT NULL,         -- data (YYYY-MM-DD) de assinatura ou de publicação
    numeracao VARCHAR(100) NOT NULL, -- final da URN, em geral o número ou código da norma
    ...
    UNIQUE(prefixo_id,datapub,numeracao)  -- validação e indexação
 );
-
 CREATE VIEW lexml.urns AS
-   --
    -- URNs expressas como string unica, e demais dados herdados das demais tabelas.
-   --
-  SELECT p.grupo_id, d.grcnt_id, p.prefixo||':'||d.datapub||':'||d.numeracao as urn, ... 
+  SELECT p.prefixo||':'||d.datapub||':'||d.numeracao as urn, ... 
   FROM lexml.urn_prefixos p  INNER JOIN lexml.urn_detalhes d ON p.id=d.prefixo_id;
 ```
 
