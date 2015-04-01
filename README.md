@@ -38,22 +38,22 @@ Ver `ini.sql`, testado em [PostgreSQL v9+](http://www.postgresql.org/). Resumo:
 
 ```sql
 CREATE TABLE lexml.urn_prefixos(
-   -- Prefixos das URNs LEX-BR, formando um conjunto de categorias.
-   id serial NOT NULL PRIMARY KEY,
-   prefixo text NOT NULL,  -- "jurisdição:autoridade:tipoMedida"
-   escopo char(3),  -- prj=proposições, jus=justiça, leg=legislativo/exec, bib=bibliotecas
-   ...
+  -- Prefixos das URNs LEX-BR, formando um conjunto de categorias.
+  id serial NOT NULL PRIMARY KEY,
+  prefixo text NOT NULL, -- "jurisdição:autoridade:tipoMedida"
+  escopo char(3), -- prj=proposições, jus=justiça, leg=legislativo/exec, bib=bibliotecas
+  ...
 );
 CREATE TABLE lexml.urn_detalhes(
-   -- URNs explodidas em prefixo+detalhe (e data+numeracao)
-   prefixo_id integer REFERENCES lexml.urn_prefixos(id),
-   datapub date NOT NULL,           -- data (YYYY-MM-DD) de assinatura ou de publicação
-   numeracao VARCHAR(100) NOT NULL, -- final da URN, em geral o número ou código da norma
-   ...
-   UNIQUE(prefixo_id,datapub,numeracao)  -- validação e indexação
+  -- URNs explodidas em prefixo+detalhe (e data+numeracao)
+  prefixo_id integer REFERENCES lexml.urn_prefixos(id),
+  datapub date NOT NULL,           -- data (YYYY-MM-DD) de assinatura ou de publicação
+  numeracao VARCHAR(100) NOT NULL, -- final da URN, em geral o número ou código da norma
+  ...
+  UNIQUE(prefixo_id,datapub,numeracao)  -- validação e indexação
 );
 CREATE VIEW lexml.urns AS
-   -- URNs expressas como string unica, e demais dados herdados das demais tabelas.
+  -- URNs expressas como string unica, e demais dados herdados das demais tabelas.
   SELECT p.prefixo||':'||d.datapub||':'||d.numeracao as urn, ... 
   FROM lexml.urn_prefixos p  INNER JOIN lexml.urn_detalhes d ON p.id=d.prefixo_id;
 ```
