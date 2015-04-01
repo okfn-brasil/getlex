@@ -40,14 +40,14 @@ Ver `ini.sql`, testado em [PostgreSQL v9+](http://www.postgresql.org/). Resumo:
 CREATE TABLE lexml.urn_prefixos(
    -- Prefixos das URNs LEX-BR, formando um conjunto de categorias.
    id serial NOT NULL PRIMARY KEY,
-   prefixo text NOT NULL, -- "jurisdição:autoridade:tipoMedida"
-   escopo char(3),        -- prj=proposições, jus=justiça, leg=legislativo/executivo, bib=bibliotecas
+   prefixo text NOT NULL,  -- "jurisdição:autoridade:tipoMedida"
+   escopo char(3),  -- prj=proposições, jus=justiça, leg=legislativo/exec, bib=bibliotecas
    ...
 );
 CREATE TABLE lexml.urn_detalhes(
    -- URNs explodidas em prefixo+detalhe (e data+numeracao)
    prefixo_id integer REFERENCES lexml.urn_prefixos(id),
-   datapub date NOT NULL,         -- data (YYYY-MM-DD) de assinatura ou de publicação
+   datapub date NOT NULL,           -- data (YYYY-MM-DD) de assinatura ou de publicação
    numeracao VARCHAR(100) NOT NULL, -- final da URN, em geral o número ou código da norma
    ...
    UNIQUE(prefixo_id,datapub,numeracao)  -- validação e indexação
