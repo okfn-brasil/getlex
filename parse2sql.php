@@ -20,7 +20,7 @@ if (isset($argv[1])) $xmlFile =$argv[1];
 
 // carga prefixos
 $prefixo2id=array();
-for($h = fopen($prefixCSV, 'r'); !feof($h); $n++) {
+for($n=0, $h = fopen($prefixCSV, 'r'); !feof($h); $n++) {
 	$row = fgetcsv($h,1000);
 	if ($n && isset($row[0]) && $row[0])
 		$prefixo2id[$row[1]]=$row[0];
@@ -43,7 +43,6 @@ foreach ($locs as $loc) {
     $data=$codigo='';
     if ($etc) 
 	list($data, $codigo) = explode(";",$etc);
-    if (!$ano) $ano=0;
     $virg = $n? ',': '';
     $prefixo = "$local:$aut:$tipo";
     if (isset($prefixo2id[$prefixo]))

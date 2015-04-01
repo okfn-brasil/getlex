@@ -41,8 +41,9 @@ foreach ($locs as $loc) {
 	elseif ($baiXML && file_exists($fileXML)) {
 		print "usando $fileXML... ";
 		$DO = "php parse2sql.php $fileXML | psql -h localhost -p 5432 -U postgres";
-		system($DO);
+		system($DO); // no escuro... nao verifica retorno
 		file_put_contents($fileCtrl,'');
+		unlink($fileXML);
 		$nmais++;
 	} else {
 		if ($baiXML) 
@@ -50,7 +51,7 @@ foreach ($locs as $loc) {
 		else
 			$DO = "wget -qO- $url |php parse2sql.php | psql -h localhost -p 5432 -U postgres";
 		print " OK $nmais/$gerarMais fazendo $file\n\t$DO";
-		system($DO);
+		system($DO); // no escuro... nao verifica retorno
 		if (!$baiXML) 
 			file_put_contents($fileCtrl,'');
 		$nmais++;

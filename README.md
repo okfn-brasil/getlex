@@ -63,11 +63,13 @@ Depois do `git clone` temos uma pasta `/getlex`, a partir da qual podemos rodar 
 ```shel
   psql -h localhost -p 5432 -U postgres < ini.sql
   psql -h localhost -p 5432 -U postgres -c "
-    COPY lexml.urn_prefixos FROM '/yourLocalPath/getlex/data/urn_prefixos.csv' DELIMITER ',' CSV HEADER
+    COPY lexml.urn_prefixos(id,prefixo,kx_n_urns,grupo_id,escopo) 
+    FROM '/yourLocalPath/getlex/data/urn_prefixos.csv' DELIMITER ',' CSV HEADER
   "
   php carga.php xml
   php carga.php
 ```
+
 O primeiro comando iniciado por `psql` cria as tabelas SQL do esquema lexml, apresentado na seção anterior. Em seguida (segundo  `psql`) deve-se efetuar a carga do 
 
 
