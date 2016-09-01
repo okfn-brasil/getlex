@@ -10,18 +10,24 @@
  * @dependences parse2sql.php
  *
  * INFO: 
- *   taxa de transferência com banda boa, ~8 segundos/bloco. O que mata são os 6 a 8 minutos/bloco de INSERT.
+ *   taxa de transferência com banda boa, ~8 segundos/bloco. O que mata são os 3 a 8 minutos/bloco de INSERT, mesmo no modo draft.
  */
 
 // // BEGIN:CONFIGS // // //
-$xmlFile='data/sitemap_index.xml';
+$xmlFile= 'http://www.lexml.gov.br/sitemap_index.xml'; // ou 'data/sitemap_index.xml';
 $carregadosDir = 'carregados';
 $gerarMais = 150;
 $baiXML = false;
+$draftmode = '';
 // // END:CONFIGS //
 
-if (isset($argv[1]) && $argv[1]!='direto') 
-	$baiXML = true;
+if (isset($argv[1])) {
+	if ($argv[1]=='draft' || $argv[1]=='draft-direto')
+		$draftmode = 'draft';
+	elseif ($argv[1]!='direto') 
+		$baiXML = true;
+}
+
 
 set_time_limit($gerarMais*200);
 $dom = new DOMDocument;
@@ -38,18 +44,19 @@ foreach ($locs as $loc) {
 	print "\n -- $n -- ";
 	if (file_exists($fileCtrl) || ($baiXML && file_exists($fileCtrl))) 
 		print "JA FOI $file";
-	elseif ($baiXML && file_exists($fileXML)) {
-		print "usando $fileXML... ";
-		$DO = "php parse2sql.php $fileXML | psql -h localhost -p 5432 -U postgres";
+	elseif (!$baiXML && file_exists($fileXML)) {
+		print "usando $fileXML... ($draftmode) ";
+		$DO = "php parse2sql.php $draftmode $fileXML | psql -h localhost -p 5432 -U postgres";
 		system($DO); // no escuro... nao verifica retorno
 		file_put_contents($fileCtrl,'');
 		unlink($fileXML);
 		$nmais++;
 	} else {
-		if ($baiXML) 
+		//print "\n cade? $fileXML";
+		if ($baiXML) // baixando
 			$DO = "wget -qO- $url > $fileXML";
-		else
-			$DO = "wget -qO- $url |php parse2sql.php | psql -h localhost -p 5432 -U postgres";
+		else // direto
+			$DO = "wget -qO- $url |php parse2sql.php $draftmode | psql -h localhost -p 5432 -U postgres";
 		print " OK $nmais/$gerarMais fazendo $file\n\t$DO";
 		system($DO); // no escuro... nao verifica retorno
 		if (!$baiXML) 

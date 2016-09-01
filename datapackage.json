@@ -16,7 +16,7 @@
     {
       "name": "Coordenação do LexML",
       "web": "http://projeto.lexml.gov.br/contact-info"
-    },
+    }
   ],
 
   "resources": [
@@ -77,9 +77,53 @@
 		    "type": "string"
 		  },
 		  {
+		    "name": "escopo",
+		    "description": "rótulo do poder (legislativo+executivo/judiciario) ou escopo (original ou doutrina) da autoridade",
+		    "type": "string"
+		  },
+		  {
 		    "name": "n_urns",
 		    "description": "Número de URNs que aparecem com essa autoridade",
 		    "type": "integer"
+		  }
+	]}
+     },
+
+
+     {
+      "url": "https://github.com/ppKrauss/getlex/master/data/ISO-3166-2-BR.csv",
+      "path": "data/ISO-3166-2-BR.csv",
+      "description": "Dataset adaptado da ISO 3166-2:BR, com anos de criação e extinção de cada estado.",
+      "schema": {"fields": [
+		  {
+		    "name": "Subdivision",
+		    "description": "rótulo de 2 letras da subdivisão do país (ex. sigla do estado).",
+		    "type": "string"
+		  },
+		  {
+		    "name": "Name",
+		    "description": "Nome oficial por extenso",
+		    "type": "string"
+		  },
+		  {
+		    "name": "creation",
+		    "description": "Ano em que a subdivisão foi oficialmente criada",
+		    "type": "integer"
+		  },
+		  {
+		    "name": "extinction",
+		    "description": "Ano em que a subdivisão foi oficialmente extinta",
+		    "type": "integer"
+		  },
+		  {
+		    "name": "CurrentLevel",
+		    "description": "Tipo corrente (atualizado) de subdivisão (ex. estado, distrito federal ou território)",
+		    "type": "string"
+		  },
+		  {
+		    "name": "Notes",
+		    "description": "Notas informativas (opcionais)",
+		    "type": "string"
 		  }
 	]}
      },
@@ -92,6 +136,11 @@
 		  {
 		    "name": "tipoDocumento",
 		    "description": "Nome de tipo de documento conforme ortgrafia das URNs LEX",
+		    "type": "string"
+		  },
+		  {
+		    "name": "escopo",
+		    "description": "rótulo do poder (legislativo+executivo/judiciario) ou escopo (original ou doutrina) da autoridade",
 		    "type": "string"
 		  },
 		  {

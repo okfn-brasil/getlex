@@ -70,17 +70,16 @@ Depois do `git clone` temos uma pasta `/getlex`, a partir da qual podemos rodar 
   php carga.php
 ```
 
-O primeiro comando iniciado por `psql` cria as tabelas SQL do esquema lexml, apresentado na seção anterior. Em seguida (segundo  `psql`) deve-se efetuar a carga do 
+O primeiro comando iniciado por `psql` cria as tabelas SQL do esquema lexml, apresentado na seção anterior. Em seguida (segundo  `psql`) deve-se efetuar a carga do ????
 
+?? e a atualização dos prefixos?
 
 O primeiro comando `php carga` traz os arquivos XML em meia hora ou um pouco mais se a rede estiver lenta; o segundo faz de fato a carga no banco de dados. Fazer a carga em duas etapas gasta temporariamente mais disco, mas em geral é mais seguro que opção `php carga.php direto`, tendo em vista que a demora maior é de CPU para processar os comandos `INSERT` no SQL, tratado em blocos para evitar inconsistências em caso de falha.
 
 Se a base já existe, e a intenção é atualizar, deve-se conferir se a aplicação (ex. *shortlex*) criou seu próprio script de manutenção, e portanto deve-se tomar muito coidado antes de realizar no SQL o comando `DROP SCHEMA lexml CASCADE`, `DELETE` ou similares.
 
 ### Disponibilidade e carga na base de dados
-Como são muitos dados, a totalidade das URN LEX não pode ser disponibilizada como simples *download*, pois comprometeria a banda do servidor `Lexml.gov.br`. O *download* completo das URNs é oferecido em blocos de 50 mil items, e a lista completa dos blocos **[deve ser solicitada pelo formulário de contato do LexML](http://projeto.lexml.gov.br/contact-info)**, sendo em  seguida enviada por e-mail, onde estará disível o arquivo completo `sitemap_index.xml`.
-
-Recomenda-se baixar os dados (rodar `carga.php`) apenas em horário de menor demanda (madrugada de Brasília).
+Como são muitos dados, a totalidade das URN LEX não pode ser disponibilizada como simples *download*, pois comprometeria a banda do servidor `Lexml.gov.br`. O *download* completo das URNs é oferecido em blocos de 50 mil items, e a lista completa dos blocos é fornecida por um arquivo XML, disponível em [lexml.gov.br/sitemap_index.xml](http://www.lexml.gov.br/sitemap_index.xml) (ou outro local indicado pelo [dadosabertos.senado.leg.br](http://dadosabertos.senado.leg.br/). Ao rodar o script `carga.php` esses dados serão baixados (sugere-se realizar esse procedimento fora de horário comercial para não sobrecarregar os servidores).
 
 ## Preparação dos arquivos CSV
 A geração de [arquivos CSV-dataset padrão](https://github.com/datasets), no contexto *getlex*, é realizada a partir de uma base SQL, local ou do servidor. A tabela que origina o `urn_prefixos.csv`, em particular, vem do servidor central LexML, seus IDs não mudam, as atualizações apenas acrescentam novos IDs. O padrão "OKFN core datasets" adotado também exige que todos os arquivos CSV que constam na pasta de dados `/data` sejam descritos em `datapackage.json`.

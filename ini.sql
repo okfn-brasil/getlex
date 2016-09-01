@@ -55,5 +55,12 @@ CREATE VIEW lexml.urns AS
   FROM lexml.urn_prefixos p  INNER JOIN lexml.urn_detalhes d ON p.id=d.prefixo_id;
   
 
+-- -- -- --
+-- APOIO:
+
+CREATE TABLE  lexml.draft (id bigserial, urn text); -- para uso apenas em modo de carga draft (tabela temporária)
+CREATE TABLE  lexml.pending (id bigserial, urn text, refdate text); -- para registro de novas URNs, como prefixo pendente.
+
+
 
 
