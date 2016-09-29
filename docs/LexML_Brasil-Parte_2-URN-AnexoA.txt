@@ -125,58 +125,55 @@ id-particao ::= normalID+
 /* Estrutura do elemento versao  */
 /*------------------------------------------------------------------- */
 
-versao ::= [ ( datas  
+versao ::= ( ( datas  
                | "versao.original"  
                | "inicio.vigencia" 
                | "multivigente" ) 
-             [ ";" evento [ ";" visao )? )? 
+             ( ";" evento ( ";" visao )? )? 
            )?  
 evento ::= normal+
 visao  ::= datas
 
 
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento forma */
-/*------------------------------------------------------------------- */
-forma :: = tipo-forma [ ";" lingua )? ("," lingua)* )? 
+/*-------------------------------------------------------------------
+ * Estrutura do elemento forma
+ *------------------------------------------------------------------- */
+
+forma ::= tipo-forma (";" lingua)? ("," lingua)*
 tipo-forma  ::= normal+
 
-
-lingua      ::= lingua-codigo  
-                    ["-" lingua-script )?  ["-" lingua-regiao )?  
+lingua      ::= lingua-codigo ("-" lingua-script )?  ("-" lingua-regiao )?  
 lingua-codigo ::= minuscula+  
 lingua-script ::= minuscula+
 lingua-regiao ::= minuscula+
 
 
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento datas */
-/*------------------------------------------------------------------- */
+/*-------------------------------------------------------------------
+ * Estrutura do elemento datas
+ *------------------------------------------------------------------- */
+
 datas   ::= ( data ("," data)* ) | periodo   
 periodo ::= "[" data "," data "]"              
 data ::= ano "-" mes "-" dia 
-ano ::= 4numeral 
-mes ::= 2numeral 
-dia ::= 2numeral
+ano ::= numeral+ /* x4*/
+mes ::= numeral+ /* x2*/ 
+dia ::= numeral+ /* x2*/ 
 
 
-/*------------------------------------------------------------------- */
-/* Caracteres admitidos */
-/*------------------------------------------------------------------- */
+/*-------------------------------------------------------------------
+ * Caracteres admitidos
+ *------------------------------------------------------------------- */
 
 aceitos-lex ::= normal | reservado | detalhaID | outro  
 normal      ::= minuscula | numeral | "." 
 normalID    ::= normal | detalhaID 
 
-minuscula   ::=   "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" |  
-              "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" |  
-              "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" 
+minuscula   ::= [a-z]
+numeral     ::= [0-9] 
 
-numeral     ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" 
-
-reservado   ::= ":" | "@" | ";" | "," | "[" | "]" |  "!" | "~" 
+reservado   ::= [:@;,!~] | "[" | "]"
 
 detalhaID   ::= "_" | "-" 
 
-outro       ::= "=" | "$"  
+outro       ::= "=" | "$"
 
