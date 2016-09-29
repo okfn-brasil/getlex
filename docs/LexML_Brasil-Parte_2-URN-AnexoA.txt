@@ -37,6 +37,7 @@ local-judiciario ::= ramo-justica (";" detalhe-ramo)*
 ramo-justica  ::= "justica."  
    ("federal" | "trabalho" | "eleitoral" | "militar" | "estadual")
 
+
 /*-------------------------------------------------------------------
  * Estrutura de um nome específico do "lex-br"
  *------------------------------------------------------------------- */
@@ -46,6 +47,7 @@ NSS-lex-local ::= documentoComplexo
 
 documentoIndividual ::= documentoComplexo ("@" versao)? ("~" forma)? 
 documentoComplexo   ::= documento 
+
 
 /*-------------------------------------------------------------------
  * Estrutura do elemento documento
@@ -86,16 +88,12 @@ nome-subtipo-sequenciador    ::= normal+
 nome-periodico-oficial       ::= normal+ 
 nome-secao-periodico-oficial ::= normal+
 
-detalhe-extra-suplemento ::=  
-      ( "edicao.extra" | "suplemento" ) ("." numeral+)?
-
+detalhe-extra-suplemento ::=  ( "edicao.extra" | "suplemento" ) ("." numeral+)?
 
 
 /*------------------------------------------------------------------- */
 /* Estrutura do elemento descritor */
 /*------------------------------------------------------------------- */
-
-  
 
 descritor ::=  datasOuAno ";" identificadores  
                     ( ";" id-componente ("," titulo-componente)? )*  
@@ -113,6 +111,7 @@ titulo-componente ::= normal+
 seq-retificacao   ::= numeral+ 
 datasOuAno        ::= datas | ano
 
+
 /*-------------------------------------------------------------------
  * Estrutura do elemento fragmento
  *------------------------------------------------------------------- */
@@ -121,14 +120,17 @@ fragmento ::= ( id-particao | intervalo-ids ) ("," fragmento)*
 intervalo-ids ::= "[" id-particao "," id-particao "]" 
 id-particao ::= normalID+
 
+
 /*------------------------------------------------------------------- */
 /* Estrutura do elemento versao  */
 /*------------------------------------------------------------------- */
+
 versao ::= [ ( datas  
                | "versao.original"  
                | "inicio.vigencia" 
                | "multivigente" ) 
-             [ ";" evento [ ";" visao ] ] ]  
+             [ ";" evento [ ";" visao )? )? 
+           )?  
 evento ::= normal+
 visao  ::= datas
 
@@ -136,15 +138,17 @@ visao  ::= datas
 /*------------------------------------------------------------------- */
 /* Estrutura do elemento forma */
 /*------------------------------------------------------------------- */
-forma :: = tipo-forma [ ";" lingua ] ("," lingua)* ] 
+forma :: = tipo-forma [ ";" lingua )? ("," lingua)* )? 
 tipo-forma  ::= normal+
 
 
 lingua      ::= lingua-codigo  
-                    ["-" lingua-script ]  ["-" lingua-regiao ]  
+                    ["-" lingua-script )?  ["-" lingua-regiao )?  
 lingua-codigo ::= minuscula+  
 lingua-script ::= minuscula+
 lingua-regiao ::= minuscula+
+
+
 /*------------------------------------------------------------------- */
 /* Estrutura do elemento datas */
 /*------------------------------------------------------------------- */
@@ -153,168 +157,26 @@ periodo ::= "[" data "," data "]"
 data ::= ano "-" mes "-" dia 
 ano ::= 4numeral 
 mes ::= 2numeral 
-dia ::= 2numeral */
-/*------------------------------------------------------------------- */
-/* Caracteres admitidos */
-/*------------------------------------------------------------------- */
-aceitos-lex ::= normal | reservado | detalhaID | outro  
-normal      ::= minuscula | numeral | "." 
-normalID    ::= normal | detalhaID 
-minuscula   ::=   "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" |  
-              "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" |  
-              "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" 
-numeral     ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" 
-reservado   ::= ":" | "@" | ";" | "," | "[" | "]" |  "!" | "~" 
-detalhaID   ::= "_" | "-" 
-outro       ::= "=" | "$"  
-
-*/
-/*------------------------------------------------------------------- */
-/* Estrutura de um nome uniforme (URN) do espaço "lex" */
-/*------------------------------------------------------------------- */
-URN ::= "urn:" NID ":" NSS-lex 
-NID ::= "lex" */
-/*------------------------------------------------------------------- */
-/* Estrutura de um nome uniforme do espaço "lex" internacionalizado */
-/*------------------------------------------------------------------- */
-NSS-lex ::= local ":" NSS-lex-local 
-local   ::= codigo-pais [ detalhamento-local ] */
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento local para o Brasil */
-/*------------------------------------------------------------------- */
-codigo-pais        ::= "br" 
-detalhamento-local ::=  
-     ( [";" unidade-federacao-ou-uf   [";" municipio ] ] ) 
-   | ( [";" unidade-federacao-ou-uf ] [";" local-judiciario ] ) 
-detalhe-ramo  ::= (  (("regiao." |"zona.") numeral+ ) 
-  | ( "secao.judiciaria" | "comarca" ) 
-  | ( unidade-federacao-ou-uf ("," unidade-federacao-ou-uf)* ) 
-  | ( municipio ("," municipio)* )  ) 
-unidade-federacao-ou-uf ::= unidade-federacao | 2minuscula 
-unidade-federacao  ::= (minuscula+ | ".")+
-municipio          ::= (minuscula+ | ".")+ 
-local-judiciario ::= ramo-justica (";" detalhe-ramo)*
-ramo-justica  ::= "justica."  
-   ("federal" | "trabalho" | "eleitoral" | "militar" | "estadual") */
-/*------------------------------------------------------------------- */
-/* Estrutura de um nome específico do "lex-br" */
-/*------------------------------------------------------------------- */
-NSS-lex-local ::= documentoComplexo    
-                | ( documentoIndividual [ "!" fragmento ] ) 
-documentoIndividual ::= documentoComplexo [ "@" versao ] [ "~" forma ] 
-
-
-documentoComplexo   ::= documento  */
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento documento */
-/*------------------------------------------------------------------- */
-documento ::= autoridade ":" tipo-documento ":" descritor  */
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento autoridade */
-/*------------------------------------------------------------------- */
-autoridade  ::= sujeito ("," sujeito)*
-sujeito          ::=  (  instituicao  (";"  orgao)*  [  ";"  funcao  ]  ) 
-                      | cargo 
-instituicao ::= normal+ 
-orgao       ::= normal+ 
-funcao      ::= normal+ 
-cargo       ::= normal+
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento tipo-documento */
-/*------------------------------------------------------------------- */
-tipo-documento       ::= ( ( tipo-norma  
-                            | tipo-jurisprudencia  
-                            | tipo-projeto-norma  
-
- ) [";" nome-subtipo-sequenciador ] ) 
-
-                           | ( "publicacao.oficial;" nome-periodico-oficial 
-                              [";" nome-secao-periodico-oficial ]  
-                              [";" detalhe-extra-suplemento ]  ) 
-tipo-projeto-norma   ::= normal+
-tipo-norma           ::= normal+ 
-tipo-jurisprudencia  ::= normal+ 
-nome-subtipo-sequenciador    ::= normal+ 
-nome-periodico-oficial       ::= normal+ 
-nome-secao-periodico-oficial ::= normal+ 
-detalhe-extra-suplemento ::= "edicao.extra" | "suplemento" */
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento descritor */
-/*------------------------------------------------------------------- */
-
-
-descritor ::=  ( (  datas [ ";" identificadores ] ) 
-                 | ( datasOuAno ";" identificadores ) 
-                 | ( [ datasOuAno ";" ] apelido-documento ) 
-                 )     
-            (";" id-componente ["," titulo-componente ] )*  
-            ( ";retificacao." seq-retificacao)?   
-identificadores   ::= ( id-documento  ("," id-documento)* ) 
-                      | ( numero-lex ) 
-                      | ( numero-seq ) 
-apelido-documento ::= normal+ 
-id-documento      ::= normalID+  
-numero-lex        ::= "lex-" numeral+ 
-numero-seq        ::= "seq-" sigla-orgao "-" numeral+ 
-sigla-orgao        ::= normal+ 
-id-componente     ::= normal+ 
-titulo-componente ::= normal+ 
-seq-retificacao   ::= numeral+ 
-datasOuAno        ::= datas | ano
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento fragmento */
-/*-------------------------------------------------------------------     
-fragmento ::= ( id-particao | intervalo-ids ) ("," fragmento)* 
-intervalo-ids ::= "[" id-particao "," id-particao "]" 
-id-particao ::= normalID+
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento versao  */
-/*------------------------------------------------------------------- */
-versao ::= [ ( datas  
-               | "versao.original"  
-               | "inicio.vigencia" 
-               | "multivigente" 
-               | "versao.vigente.em;" data 
-               | "versao.eficaz.em;" data  
-               | "versao.consultada.em;" data  )  
-           [ ";" evento [ ";" visao ] ] ]  
-
-evento ::= normal+   
-visao  ::= datas
-
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento forma */
-/*------------------------------------------------------------------- */
-
-forma :: = tipo-forma (";" lingua)? ("," lingua)*
-tipo-forma  ::= normal+
-
-lingua      ::= lingua-codigo ["-" lingua-script ]  ["-" lingua-regiao ]  
-lingua-codigo ::= minuscula+   
-lingua-script ::= minuscula+  
-lingua-regiao ::= minuscula+
-
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento datas */
-/*------------------------------------------------------------------- */
-datas   ::= ( data ("," data)* ) | periodo   
-periodo ::= "[" data "," data "]"        
-data ::= ano "-" mes "-" dia 
-ano ::= 4numeral 
-mes ::= 2numeral 
 dia ::= 2numeral
 
+
 /*------------------------------------------------------------------- */
 /* Caracteres admitidos */
 /*------------------------------------------------------------------- */
+
 aceitos-lex ::= normal | reservado | detalhaID | outro  
 normal      ::= minuscula | numeral | "." 
 normalID    ::= normal | detalhaID 
+
 minuscula   ::=   "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" |  
               "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" |  
               "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" 
+
 numeral     ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" 
-reservado   ::= ":" | "@" | ";" | "," | "[" | "]" | "!" | "~" 
+
+reservado   ::= ":" | "@" | ";" | "," | "[" | "]" |  "!" | "~" 
+
 detalhaID   ::= "_" | "-" 
-outro       ::= "=" | "$" 
+
+outro       ::= "=" | "$"  
 
