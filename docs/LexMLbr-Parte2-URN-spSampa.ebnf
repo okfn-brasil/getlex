@@ -1,0 +1,116 @@
+/*-------------------------------------------------------------------
+ * Estrutura URNs do município de São Paulo
+ *------------------------------------------------------------------- */
+
+URN ::= "urn:lex:br;sao.paulo;sao.paulo" (urn-leg |urn-exec | urn-dom)
+
+urn-exec ::= (";" subJurisdicao)? ":" autoridade-executivo ":" tipo-documento ":" descritor
+
+urn-dom ::= ":imprensa.nacional:publicacao.oficial;diario.oficial.municipio" (";" nome-secao-periodico-oficial)? ":" descritor-dom
+
+urn-leg ::=  ":camara.municipal:" tipo-documento-legislativo ":" descritor
+
+
+nome-secao-periodico-oficial ::= "materia" | "errata" | "materia.externa"
+
+descritor-dom ::= data ";" identificadores (";" id-componente )*    
+
+subJurisdicao ::= "aricanduva"|"butanta"|"campo.limpo"|"capela.do.socorro"| "..." 
+
+
+/*-------------------------------------------------------------------
+ * Estrutura do elemento autoridade
+ *------------------------------------------------------------------- */
+
+
+autoridade-executivo ::= "municipal" (";" subAutoridade)? ("," sujeito)*
+
+subAutoridade ::= "controladoria.geral.município" | "secretaria.governo.municipal" 
+         | "secretaria.executiva.comunicacao" | "..."| sujeito-sub
+
+sujeito-sub  ::=  (orgao (";"  orgao)*  (";"  funcao)?)  |  cargo 
+
+sujeito  ::=  ( instituicao  (";"  orgao)*  (";"  funcao)? )  |  cargo 
+
+sujeito-sub  ::=  ( orgao (";"  orgao)*  (";"  funcao)? )  |  cargo 
+
+instituicao ::= normal+ 
+orgao       ::= normal+ 
+funcao      ::= normal+ 
+cargo       ::= normal+
+
+
+/*-------------------------------------------------------------------
+ * Estrutura do elemento tipo-documento
+ *------------------------------------------------------------------- */
+
+tipo-documento ::=  (
+     ("portaria" | "..." | "contrato" | "convenio") 
+     (";" nome-subtipo-sequenciador)?
+   )
+
+tipo-documento-legislativo ::=  (
+     ((("lei" | "decreto" | "..." ) (";" Subtipo)?) | tipo-projeto-norma) 
+     (";" nome-subtipo-sequenciador)? 
+   )
+
+tipo-projeto-norma   ::= "projeto.lei" | "..." 
+
+nome-subtipo-sequenciador    ::= normal+
+
+
+
+/*-------------------------------------------------------------------
+ * Estrutura do elemento descritor
+ *------------------------------------------------------------------- */
+
+descritor ::=  datasOuAno ";" identificadores  
+                    ( ";" id-componente ("," titulo-componente)? )*  
+                     (";retificacao." seq-retificacao)?
+
+identificadores ::= ( id-documento  ("," id-documento)* ) 
+                    | ( numero-lex ) 
+                    | ( numero-seq )
+
+id-documento      ::= normalID+  
+numero-lex        ::= "lex-" numeral+ 
+numero-seq        ::= "seq-" sigla-orgao "-" numeral+ 
+sigla-orgao        ::= normal+ 
+id-componente     ::= normal+ 
+titulo-componente ::= normal+ 
+seq-retificacao   ::= numeral+ 
+datasOuAno        ::= datas | ano
+
+
+/*-------------------------------------------------------------------
+ * Estrutura do elemento datas
+ *------------------------------------------------------------------- */
+
+datas   ::= ( data ("," data)* ) | periodo   
+periodo ::= "[" data "," data "]"              
+data ::= ano "-" mes "-" dia 
+ano ::= numeral4
+mes ::= numeral2 
+dia ::= numeral2 
+
+
+/*-------------------------------------------------------------------
+ * Caracteres admitidos
+ *------------------------------------------------------------------- */
+
+
+normal      ::= minuscula | numeral | "." 
+normalID    ::= normal | detalhaID 
+
+minuscula   ::= [a-z]
+numeral     ::= [0-9] 
+numeral2     ::= [0-9][0-9] 
+numeral4     ::= [0-9][0-9][0-9][0-9] 
+
+detalhaID   ::= "_" | "-" 
+
+
+
+
+
+

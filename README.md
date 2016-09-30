@@ -70,9 +70,7 @@ Depois do `git clone` temos uma pasta `/getlex`, a partir da qual podemos rodar 
   php carga.php
 ```
 
-O primeiro comando iniciado por `psql` cria as tabelas SQL do esquema lexml, apresentado na seção anterior. Em seguida (segundo  `psql`) deve-se efetuar a carga do ????
-
-?? e a atualização dos prefixos?
+O primeiro comando `psql` cria as tabelas SQL do esquema lexml, apresentado na seção anterior. Em seguida deve-se efetuar a carga do arquivo *urn_prefixos.csv* para atualização dos prefixos. {FALTA revisar algoritmo de inclusão de novos prefixos}
 
 O primeiro comando `php carga` traz os arquivos XML em meia hora ou um pouco mais se a rede estiver lenta; o segundo faz de fato a carga no banco de dados. Fazer a carga em duas etapas gasta temporariamente mais disco, mas em geral é mais seguro que opção `php carga.php direto`, tendo em vista que a demora maior é de CPU para processar os comandos `INSERT` no SQL, tratado em blocos para evitar inconsistências em caso de falha.
 
@@ -97,6 +95,32 @@ e esse preparo difere dos demais apenas pelo trecho `SELECT a,b FROM foo`. Desse
 ou ainda com `\copy (...) TO '/tmp/test.csv' WITH ...` (o PHP também oferece [pg_copy_to](http://php.net/manual/en/function.pg-copy-to.php)), mas a chamada `psql` no termial (*client*) das versões novas (v9+) vem munidas do STDIN/STDOUT.
 -->
 
+----
+
+## Hashes da URN compacta
+
+Compactar requer um algoritmo para a redução da URN LEX: sem o uso de um identificador opaco, lançando mão de funções de hashing (por exemplo SHA-1, Murmur2, ou CRC32) com baixa taxa de colisão nas amostragens. 
+
+No levantamento dos diversos tipos de aplicação (ex. Códigos QR), notou-se que os requisitos são praticamente os mesmos. Há que se usar representação final do identificador em  base36 ao invés de outra mais compacta.
+
+Como as estratégias de hashing estão sempre sujeitas a apresentar colisões (duas URNs com mesmo hash), algumas elementos adicionais podem ser concatenados ao hash para formar uma URN  (ver elementos na [sintáxe da URN LEX-BR](http://okfn-brasil.github.io/getlex/docs/LexMLbr-Parte2-URN-AnexoA.xhtml)) compacta unívoca:
+
+
+* Metadados compactos:
+
+  * ano-mês: podem ser condensados em 3 dígitos base36.
+
+  * prefixo da `jurisdicao`: em função do ano a jurisdição pode fazer uso das [siglas padronizadas de UF](https://github.com/okfn-brasil/getlex/blob/master/data/ISO-3166-2-BR.csv). Um só dígito base36 é necessário a cada ano. Na sintaxe, o que sobra depois desse prefixo é `jurisdicao-sufixo`.
+
+  * versão-escopo: dado suplementar para controlar modo de hashing, garantindo ausência de colisões nos hashes.
+
+* Composição de duas hashes:
+
+  * `jurisdicao-sufixo` , `autoridade` e `tipo-documento` formam a entrada para o *primeiro hash*. Estatisticas por escopo, ano e prefixo de jurisdição.
+
+  * `descritor` (sem ano e mês) forma a entrada para o *segundo hash*. Estatisticas por escopo.
+
+As estatísticas de colisão permitem a escolha e confirmação de validade dos hashes. A estratégia é garantir que as colisões sejam mínimas e, sobretudo, que a resolução das colisões (sem demanda por performance) em [Open Adressing](https://www.wikidata.org/wiki/Q7096315) seja necessária apenas nos períodos em que o identificador oficial e o local ficam fora de sincronia. A modelagem dos sistemas de identificação e estimativas de tempo, seguem o [_modelo de referência_ 2016](https://doi.org/10.5281/zenodo.159004).
 
 -----
 

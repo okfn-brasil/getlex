@@ -42,11 +42,8 @@ ramo-justica  ::= "justica."
  * Estrutura de um nome específico do "lex-br"
  *------------------------------------------------------------------- */
 
-NSS-lex-local ::= documentoComplexo    
-                | ( documentoIndividual ("!" fragmento)? )
-
-documentoIndividual ::= documentoComplexo ("@" versao)? ("~" forma)? 
-documentoComplexo   ::= documento 
+NSS-lex-local ::= documento | ( documentoIndividual ("!" fragmento)? )
+documentoIndividual ::= documento ("@" versao)? ("~" forma)? 
 
 
 /*-------------------------------------------------------------------
@@ -91,9 +88,9 @@ nome-secao-periodico-oficial ::= normal+
 detalhe-extra-suplemento ::=  ( "edicao.extra" | "suplemento" ) ("." numeral+)?
 
 
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento descritor */
-/*------------------------------------------------------------------- */
+/*-------------------------------------------------------------------
+ * Estrutura do elemento descritor
+ *------------------------------------------------------------------- */
 
 descritor ::=  datasOuAno ";" identificadores  
                     ( ";" id-componente ("," titulo-componente)? )*  
@@ -121,9 +118,9 @@ intervalo-ids ::= "[" id-particao "," id-particao "]"
 id-particao ::= normalID+
 
 
-/*------------------------------------------------------------------- */
-/* Estrutura do elemento versao  */
-/*------------------------------------------------------------------- */
+/*-------------------------------------------------------------------
+ * Estrutura do elemento versao
+ *------------------------------------------------------------------- */
 
 versao ::= ( ( datas  
                | "versao.original"  
