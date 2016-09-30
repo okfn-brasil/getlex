@@ -98,3 +98,11 @@ ou ainda com `\copy (...) TO '/tmp/test.csv' WITH ...` (o PHP também oferece [p
 -->
 
 
+-----
+
+### APOIO
+
+* [site deste projeto](http://okfn-brasil.github.io/getlex)
+* ...
+
+
