@@ -12,9 +12,8 @@ $jurPrefixes = [ // requer ano para delimitar intervalo de validade da UF
 ];
 
 $hashFrom = [
-	'autoridade:br0'=>'crc32b',  // falta usar dado da versão-escopo!  36 possibilidades a cada autoridade, melhor convencionar defaults.
+	'autoridade:br0'=>'sha1-t6',  // falta usar dado da versão-escopo... cria 36 possibilidades a cada autoridade, precisa defaults.
 	'autoridade:brp'=>'crc32b',
-
 ];
 
 $exemplos = [
@@ -48,7 +47,6 @@ foreach ($exemplos as $e) {
 	if (isset($p[0])) $autoridade = array_shift($p);
 	else
 		die("\nERRO-3: autoridade ausente");
-	$hash1 = hash($hashFrom["autoridade:$jurPrefix"],$jurRest.$autoridade);
 
 	if (isset($p[0])) $tipo = array_shift($p);
 	else
@@ -65,23 +63,32 @@ foreach ($exemplos as $e) {
 		if ($ano < 1600 || $ano>2017) 
 			die("\nERRO-6: descritor com ano ($ano) inválido.");
 		$ano -= 1600;
-		$anoMes = base_convert("$ano$mes",10,16);
+		$anoMes = base_convert("$ano$mes",10,36);
 	} else
 		die("\nERRO-7: descritor com sintaxe inválida.");
 
-	$hash1 = hash($hashFrom["autoridade:$jurPrefix"],$jurRest.$autoridade.$tipo);  // usar ano como seletor.
+	// falta incluir a versão e decidir por versão+1 se $autoridade ou $tipo forem compostos.
+	$h1 = $hashFrom["autoridade:$jurPrefix"];
+	$trunc = false;
+	if (preg_match('/^([a-z0-9]+)\-t(\d+)$/i',$h1,$m)) {
+		$trunc=(int) $m[2];
+		$h1 = $m[1];
+	}
+	$hash1 = hash($h1,$jurRest.$autoridade.$tipo);  // falta usar ano como seletor.
+	if ($trunc>1) $hash1 = substr($hash1,0,$trunc);
 
-	$versao=0;
+	$versao=1;
 	if (ctype_digit($code))
-		$hash2 = base_convert("$dia$code",10,16);
+		$hash2 = base_convert("$dia$code",10,36);
 	else {
-		$versao=1;
+		$versao=0;
 		$hash2 = hash('crc32b',"$dia$code");
 	}
 	$escopo=0; // falta escopo conforme auoridade e tipo
-	$VerSco = base_convert((string) $versao+6*$escopo, 10, 16);
-	$urnCurta = strtoupper($jurPrefix.$VerSco.$hash1.$anoMes.$hash2);
-	print "\n URN curta = $urnCurta";
+	$VerSco = base_convert((string) $versao+6*$escopo, 10, 36);
+	$urnCurta = strtoupper($jurPrefix.$VerSco.$anoMes.$hash1.$hash2);
+
+	print "\n URN curta = $urnCurta = $jurPrefix.$VerSco.$anoMes.$hash1.$hash2";
 }
 ?>
 
