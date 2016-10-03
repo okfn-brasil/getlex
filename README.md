@@ -103,7 +103,7 @@ Compactar requer um algoritmo para a redução da URN LEX: sem o uso de um ident
 
 No levantamento dos diversos tipos de aplicação (ex. Códigos QR), notou-se que os requisitos são praticamente os mesmos. Há que se usar representação final do identificador em  base36 ao invés de outra mais compacta.
 
-Como as estratégias de hashing estão sempre sujeitas a apresentar colisões (duas URNs com mesmo hash), algumas elementos adicionais podem ser concatenados ao hash para formar uma URN  (ver elementos na [sintáxe da URN LEX-BR](http://okfn-brasil.github.io/getlex/docs/LexMLbr-Parte2-URN-AnexoA.xhtml)) compacta unívoca:
+Como as estratégias de hashing estão sempre sujeitas a apresentar colisões (duas URNs com mesmo hash), algumas elementos adicionais podem ser concatenados ao hash para formar uma URN  (ver elementos na [sintáxe da URN LEX-BR](http://okfn-brasil.github.io/getlex/lexBr)) compacta unívoca:
 
 
 * Metadados compactos:
